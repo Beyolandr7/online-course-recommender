@@ -1,0 +1,11 @@
+vendor/
+node_modules/
+__pycache__/
+venv/
+.venv/
+.env
+*.pyc
+.phpunit.result.cache
+storage/*.key
+.idea/
+.vscode/
