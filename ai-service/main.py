@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
 from recommender import recommend_courses
 
 app = FastAPI(title="Online Course Recommender AI Service")
@@ -8,7 +8,7 @@ app = FastAPI(title="Online Course Recommender AI Service")
 
 class RecommendationRequest(BaseModel):
     user_id: str
-    interests: Optional[List[str]] = None
+    interest: str
 
 
 class CourseRecommendation(BaseModel):
@@ -24,16 +24,17 @@ class RecommendationResponse(BaseModel):
 
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to AI Recommendation Service"}
+    return {
+        "message": "Welcome to AI Recommendation Service"
+    }
 
 
 @app.post("/recommend", response_model=RecommendationResponse)
 def get_recommendation(request: RecommendationRequest):
 
-    # Gabungkan interests jadi text
-    user_input = " ".join(request.interests) if request.interests else ""
-
-    recs = recommend_courses(user_input)
+    recs = recommend_courses(
+        request.interest
+    )
 
     return {
         "user_id": request.user_id,
