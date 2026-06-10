@@ -3,7 +3,7 @@
     'showMatch' => true,
 ])
 
-<a href="{{ route('course.detail', $course['id']) }}"
+<a href="{{ route('course.detail', ['id' => $course['id'], 'match' => $course['match'] ?? null]) }}"
    class="course-card group flex h-full flex-col"
    aria-label="View {{ $course['title'] }} course detail">
 
@@ -38,26 +38,10 @@
                 <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500">
 
                     <x-icon name="star"
-                            class="h-4 w-4 text-amber-400" />
-
-                    <span class="font-bold text-slate-700">
-                        {{ $course['rating'] }}
-                    </span>
+                            class="h-4 w-4 text-amber-400" />    
 
                     <span>
-                        ({{ $course['students'] }})
-                    </span>
-
-                    <span class="text-slate-300">•</span>
-
-                    <span>
-                        {{ $course['provider'] }}
-                    </span>
-
-                    <span class="text-slate-300">•</span>
-
-                    <span>
-                        {{ $course['duration'] }}
+                        {{ $course['platform'] }}
                     </span>
 
                 </div>

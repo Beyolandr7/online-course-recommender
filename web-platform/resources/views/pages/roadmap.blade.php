@@ -5,6 +5,7 @@
 @section('page-content')
 @php
     $steps = $steps ?? [];
+    $learningPath = $learningPath ?? null;
 @endphp
 
 <div class="pt-16 lg:pt-0">
@@ -23,17 +24,17 @@
             {{-- ── HEADER ── --}}
             <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
                 <div>
-                    <a href="{{ route('home') }}"
-                       class="mb-3 inline-flex items-center gap-1.5 text-sm font-bold text-slate-500 transition hover:text-indigo-600">
-                       <a href="{{ route('home') }}" class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-700"><x-icon name="arrow" class="h-4 w-4 rotate-180" /> Back to Home</a>
+                    <a href="{{ route('my-learning') }}"
+                    class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-700">
+                        <x-icon name="arrow" class="h-4 w-4 rotate-180" />
+                        Back to My Learning
                     </a>
-
                     <h1 class="text-4xl font-black tracking-tight text-slate-950">
-                        Your Learning Roadmap
+                        {{ $learningPath?->title ?? 'Your Learning Roadmap' }}
                     </h1>
 
                     <p class="mt-2 font-medium text-slate-500">
-                        Personalized path to reach Advanced level.
+                        @if($learningPath) {{ $learningPath->initial_level }} to {{ $learningPath->target_level }} • {{ $learningPath->interest }} @else Personalized path will appear after you submit Preference Form. @endif
                     </p>
                 </div>
 
@@ -119,7 +120,7 @@
                     </h2>
 
                     <p class="mx-auto mt-2 max-w-md text-sm font-medium leading-relaxed text-slate-500">
-                        Data roadmap belum dikirim dari controller. Pastikan method roadmap() di PageController mengirim variabel $steps.
+                        Belum ada roadmap. Isi Preference Form dulu, lalu sistem akan menyimpan input kamu ke database dan membuat learning path dari rekomendasi FastAPI.
                     </p>
                 </div>
             @else
@@ -181,8 +182,8 @@
                                                 &bull; {{ $item['duration'] }}
                                             @endisset
 
-                                            @isset($item['provider'])
-                                                &bull; {{ $item['provider'] }}
+                                            @isset($item['platform'])
+                                                &bull; {{ $item['platform'] }}
                                             @endisset
                                         </p>
                                     </div>
@@ -200,18 +201,18 @@
 
                                         {{-- Action button --}}
                                         @if($completed)
-                                            <a href="{{ route('course.detail', $item['id'] ?? 1) }}"
+                                            <a href="{{ route('course.detail', ['id' => $item['id'], 'path_id' => $learningPath->id]) }}"
                                                class="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 text-sm font-black text-white shadow-sm shadow-emerald-200 transition hover:bg-emerald-600 active:scale-95">
                                                 <x-icon name="check" class="h-4 w-4"/>
                                                 Review
                                             </a>
                                         @elseif($active)
-                                            <a href="{{ route('course.detail', $item['id'] ?? 1) }}"
-                                               class="inline-flex h-10 flex-1 items-center justify-center rounded-2xl border-2 border-indigo-600 bg-white px-5 text-sm font-black text-indigo-700 transition hover:bg-indigo-50 active:scale-95">
+                                            <a href="{{ route('course.detail', ['id' => $item['id'], 'path_id' => $learningPath->id]) }}"
+                                            class="inline-flex h-10 flex-1 items-center justify-center rounded-2xl border-2 border-indigo-600 bg-white px-5 text-sm font-black text-indigo-700 transition hover:bg-indigo-50 active:scale-95">
                                                 Continue
                                             </a>
                                         @else
-                                            <a href="{{ route('course.detail', $item['id'] ?? 1) }}"
+                                            <a href="{{ route('course.detail', ['id' => $item['id'], 'path_id' => $learningPath->id]) }}"
                                                class="inline-flex h-10 flex-1 items-center justify-center rounded-2xl border border-slate-200 bg-white px-5 text-sm font-black text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 active:scale-95">
                                                 Start
                                             </a>
@@ -232,7 +233,7 @@
                         </div>
 
                         <div class="ml-4 py-3">
-                            <p class="text-sm font-black text-indigo-600">Advanced Level</p>
+                            <p class="text-sm font-black text-indigo-600">{{ $learningPath?->target_level ?? 'Target Level' }}</p>
                             <p class="text-xs font-medium text-slate-400">Complete all steps to reach your goal</p>
                         </div>
                     </div>

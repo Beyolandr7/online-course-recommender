@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="800" height="450">
+  <defs>
+    <clipPath id="card-clip-general">
+      <rect width="800" height="450" rx="24" ry="24"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#card-clip-general)">
+    <rect width="800" height="450" fill="#0f1b3d"/>
+    <circle cx="720" cy="60" r="180" fill="#3a4a8a" opacity="0.85"/>
+    <circle cx="130" cy="420" r="140" fill="#162050" opacity="1"/>
+    <rect x="200" y="160" width="220" height="14" rx="7" fill="#3a5a9b" opacity="0.7"/>
+    <rect x="200" y="192" width="160" height="14" rx="7" fill="#3a5a9b" opacity="0.7"/>
+    <rect x="200" y="224" width="200" height="14" rx="7" fill="#3a5a9b" opacity="0.7"/>
+    <polygon points="560,120 568,144 594,144 574,158 582,182 560,168 538,182 546,158 526,144 552,144" fill="#f5c842"/>
+    <!-- Icon box -->
+    <rect x="570" y="210" width="160" height="160" rx="22" fill="#1a2550" opacity="0.9"/>
+    <rect x="570" y="210" width="160" height="160" rx="22" fill="none" stroke="#8ab0f5" stroke-width="2.5"/>
+    <!-- Open book icon -->
+    <path d="M610 255 Q650 245 650 355 Q610 345 610 255 Z" fill="#8ab0f5" opacity="0.25"/>
+    <path d="M610 255 Q650 245 650 355 Q610 345 610 255 Z" fill="none" stroke="#8ab0f5" stroke-width="3"/>
+    <path d="M690 255 Q650 245 650 355 Q690 345 690 255 Z" fill="#8ab0f5" opacity="0.25"/>
+    <path d="M690 255 Q650 245 650 355 Q690 345 690 255 Z" fill="none" stroke="#8ab0f5" stroke-width="3"/>
+    <!-- Book spine -->
+    <line x1="650" y1="248" x2="650" y2="355" stroke="#f5c842" stroke-width="3"/>
+    <text x="80" y="335" font-family="Arial, sans-serif" font-size="48" font-weight="900" fill="#ffffff">General</text>
+    <text x="80" y="388" font-family="Arial, sans-serif" font-size="48" font-weight="900" fill="#ffffff">Learning</text>
+  </g>
+</svg>

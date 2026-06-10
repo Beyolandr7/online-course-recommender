@@ -1,5 +1,6 @@
 import pickle
 import numpy as np
+import pandas as pd
 import torch
 
 from transformers import AutoTokenizer, AutoModel
@@ -78,8 +79,13 @@ def recommend_courses(user_input, top_n=5):
 
         results.append({
             "course_id": str(idx),
-            "title": course["course_title"],
-            "score": float(similarity[idx])
+            "title": course["course_title"] if not pd.isna(course["course_title"]) else "",
+            "score": float(similarity[idx]),
+            "description": course["description"] if "description" in course and not pd.isna(course["description"]) else "",
+            "level": course["level"] if "level" in course and not pd.isna(course["level"]) else "",
+            "url": course["url"] if "url" in course and not pd.isna(course["url"]) else "",
+            "platform": course["platform"] if "platform" in course and not pd.isna(course["platform"]) else "",
+            "skills": course["skills"] if "skills" in course and not pd.isna(course["skills"]) else "",
         })
 
     return results

@@ -41,18 +41,48 @@
                 </div>
 
                 <div class="grid gap-6 md:grid-cols-2">
-                    <div>
-                        <label for="initial_level" class="form-label">Jenjang Kemahiran Awal</label>
-                        <input id="initial_level" name="initial_level" type="text" value="{{ old('initial_level') }}" placeholder="Contoh: Beginner" class="input-modern mt-2">
-                        @error('initial_level') <p class="form-error">{{ $message }}</p> @enderror
-                    </div>
+                <div>
+                    <label for="initial_level" class="form-label">Jenjang Kemahiran Awal</label>
 
-                    <div>
-                        <label for="target_level" class="form-label">Target Kemahiran</label>
-                        <input id="target_level" name="target_level" type="text" value="{{ old('target_level') }}" placeholder="Contoh: Advanced" class="input-modern mt-2">
-                        @error('target_level') <p class="form-error">{{ $message }}</p> @enderror
-                    </div>
+                    <input 
+                        id="initial_level" 
+                        name="initial_level" 
+                        type="text"
+                        list="level_options"
+                        value="{{ old('initial_level') }}"
+                        placeholder="Pilih atau ketik level"
+                        class="input-modern mt-2"
+                    >
+
+                    @error('initial_level') 
+                        <p class="form-error">{{ $message }}</p> 
+                    @enderror
                 </div>
+
+                <div>
+                    <label for="target_level" class="form-label">Target Kemahiran</label>
+
+                    <input 
+                        id="target_level" 
+                        name="target_level" 
+                        type="text"
+                        list="level_options"
+                        value="{{ old('target_level') }}"
+                        placeholder="Pilih atau ketik target level"
+                        class="input-modern mt-2"
+                    >
+
+                    @error('target_level') 
+                        <p class="form-error">{{ $message }}</p> 
+                    @enderror
+                </div>
+
+                <datalist id="level_options">
+                    <option value="Beginner">
+                    <option value="Intermediate">
+                    <option value="Advanced">
+                </datalist>
+            </div>
 
                 <div>
                     <label for="interest" class="form-label">Minat</label>
