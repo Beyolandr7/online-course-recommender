@@ -32,7 +32,7 @@
                 My Learning
             </h1>
             <p class="mt-2 text-sm font-medium text-slate-500">
-                Semua input Preference Form kamu tersimpan sebagai learning path di sini.
+               All your Preference Form inputs are saved as a learning path here.
             </p>
         </div>
 
@@ -121,16 +121,16 @@
 
         <div x-show="countTab(activeTab) === 0" class="rounded-2xl border border-slate-100 bg-white px-6 py-12 text-center" x-cloak>
             <p class="font-[Sora,sans-serif] text-base font-bold text-slate-950" x-text="'No learning path in ' + activeTab"></p>
-            <p class="mt-1 text-xs text-slate-400">Belum ada data untuk filter ini.</p>
+            <p class="mt-1 text-xs text-slate-400">Belum ada yang selesai — terus semangat!</p>
         </div>
     @else
         <div class="rounded-[28px] border border-indigo-100 bg-white px-6 py-12 text-center shadow-sm">
             <div class="mx-auto grid h-14 w-14 place-items-center rounded-full bg-indigo-50 text-indigo-600">
                 <x-icon name="target" class="h-6 w-6" />
             </div>
-            <h2 class="mt-4 text-xl font-black text-slate-950">Belum ada learning path</h2>
+            <h2 class="mt-4 text-xl font-black text-slate-950">Your learning path is waiting!</h2>
             <p class="mx-auto mt-2 max-w-md text-sm font-medium leading-relaxed text-slate-500">
-                Isi Preference Form terlebih dahulu. Setelah submit, datanya akan muncul sebagai card di halaman ini.
+                Complete your Preference Form to get started — your personalized cards will show up right here.
             </p>
             <a href="{{ route('preferences.create') }}" class="primary-btn mt-6 inline-flex px-5 py-3 text-sm">
                 Fill Preference Form

@@ -30,9 +30,15 @@
                 Masuk untuk melanjutkan perjalanan belajar dan melihat rekomendasi course kamu.
             </p>
 
-            @if ($errors->any())
+           @if ($errors->any())
                 <div class="mt-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-600">
                     Email atau password salah. Silakan coba lagi.
+                </div>
+            @endif
+
+            @if(session('success'))
+                <div class="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                    {{ session('success') }}
                 </div>
             @endif
 

@@ -66,36 +66,3 @@ def get_course_detail(course_id: int):
         "platform": course["platform"] if "platform" in course and not pd.isna(course["platform"]) else "",
         "skills": course["skills"] if "skills" in course and not pd.isna(course["skills"]) else "",
     }
-
-@app.get("/courses")
-def get_courses(q: str = None):
-    from recommender import df
-
-    filtered = df.copy()
-
-    if q:
-        q_lower = q.lower()
-        mask = (
-            filtered["course_title"].str.lower().str.contains(q_lower, na=False) |
-            filtered["skills"].str.lower().str.contains(q_lower, na=False) |
-            filtered["description"].str.lower().str.contains(q_lower, na=False)
-        )
-        filtered = filtered[mask]
-
-    courses = []
-
-    for idx, course in filtered.iterrows():
-        courses.append({
-            "course_id": str(idx),
-            "title": course["course_title"] if not pd.isna(course["course_title"]) else "",
-            "description": course["description"] if "description" in course and not pd.isna(course["description"]) else "",
-            "level": course["level"] if "level" in course and not pd.isna(course["level"]) else "",
-            "url": course["url"] if "url" in course and not pd.isna(course["url"]) else "",
-            "platform": course["platform"] if "platform" in course and not pd.isna(course["platform"]) else "",
-            "skills": course["skills"] if "skills" in course and not pd.isna(course["skills"]) else "",
-        })
-
-    return {
-        "courses": courses,
-        "total": len(filtered)
-    }

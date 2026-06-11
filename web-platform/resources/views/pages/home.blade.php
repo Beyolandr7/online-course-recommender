@@ -6,7 +6,8 @@
 <div class="pt-16 lg:pt-0">
     <section class="hero-card relative overflow-hidden">
 
-            {{-- Auth Links inside hero card --}}
+          {{-- Auth Links inside hero card --}}
+            @guest
             <div class="relative z-40 mb-6 flex w-full justify-end">
                 <div class="flex items-center gap-4 text-sm font-bold">
                     <a href="{{ route('login') }}" class="text-slate-500 transition hover:text-indigo-700">
@@ -18,6 +19,7 @@
                     </a>
                 </div>
             </div>
+            @endguest
 
             {{-- Background decorations --}}
             <img src="{{ asset('assets/backgrounds/bg-yellow-blob.svg') }}" 

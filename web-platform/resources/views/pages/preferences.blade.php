@@ -28,7 +28,7 @@
             </h1>
 
             <p class="mt-4 max-w-2xl text-base font-medium leading-relaxed text-slate-500">
-                Isi data berikut agar sistem dapat memberi rekomendasi course berdasarkan jurusan, jenjang kemahiran awal, minat, dan target kamu.
+                Fill in the following details so the system can recommend courses based on your major, initial skill level, interests, and goals.
             </p>
 
             <form action="{{ route('preferences.store') }}" method="POST" class="mt-9 space-y-6" novalidate>
@@ -40,49 +40,87 @@
                     @error('major') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="grid gap-6 md:grid-cols-2">
-                <div>
-                    <label for="initial_level" class="form-label">Jenjang Kemahiran Awal</label>
+<div class="grid gap-6 md:grid-cols-2">
 
-                    <input 
-                        id="initial_level" 
-                        name="initial_level" 
-                        type="text"
-                        list="level_options"
-                        value="{{ old('initial_level') }}"
-                        placeholder="Pilih atau ketik level"
-                        class="input-modern mt-2"
-                    >
+    {{-- Jenjang Kemahiran Awal --}}
+    <div x-data="levelSelect('initial_level', '{{ old('initial_level') }}')" class="relative">
+        <label class="form-label">Jenjang Kemahiran Awal</label>
+        <input type="hidden" name="initial_level" :value="selected">
 
-                    @error('initial_level') 
-                        <p class="form-error">{{ $message }}</p> 
-                    @enderror
-                </div>
+        <button type="button" @click="open = !open" @keydown.escape="open = false"
+            :class="open ? 'ring-2 ring-indigo-400 border-indigo-400' : ''"
+            class="input-modern mt-2 flex w-full items-center justify-between text-left">
+            <span :class="selected ? 'text-slate-900' : 'text-slate-400'">
+                <span x-text="selected || 'Pilih level awal'"></span>
+            </span>
+            <svg :class="open ? 'rotate-180' : ''" class="h-4 w-4 text-slate-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
 
-                <div>
-                    <label for="target_level" class="form-label">Target Kemahiran</label>
+        <div x-show="open" x-transition @click.outside="open = false"
+            class="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+            <template x-for="opt in options" :key="opt.value">
+                <button type="button" @click="select(opt.value)" :class="selected === opt.value ? 'bg-indigo-50' : 'hover:bg-slate-50'"
+                    class="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left last:border-0">
+                    <span :class="opt.badge" class="rounded-full px-2.5 py-0.5 text-xs font-semibold" x-text="opt.value"></span>
+                    <span class="text-sm text-slate-500" x-text="opt.desc"></span>
+                </button>
+            </template>
+        </div>
 
-                    <input 
-                        id="target_level" 
-                        name="target_level" 
-                        type="text"
-                        list="level_options"
-                        value="{{ old('target_level') }}"
-                        placeholder="Pilih atau ketik target level"
-                        class="input-modern mt-2"
-                    >
+        @error('initial_level') <p class="form-error">{{ $message }}</p> @enderror
+    </div>
 
-                    @error('target_level') 
-                        <p class="form-error">{{ $message }}</p> 
-                    @enderror
-                </div>
+    {{-- Target Kemahiran --}}
+    <div x-data="levelSelect('target_level', '{{ old('target_level') }}')" class="relative">
+        <label class="form-label">Target Kemahiran</label>
+        <input type="hidden" name="target_level" :value="selected">
 
-                <datalist id="level_options">
-                    <option value="Beginner">
-                    <option value="Intermediate">
-                    <option value="Advanced">
-                </datalist>
-            </div>
+        <button type="button" @click="open = !open" @keydown.escape="open = false"
+            :class="open ? 'ring-2 ring-indigo-400 border-indigo-400' : ''"
+            class="input-modern mt-2 flex w-full items-center justify-between text-left">
+            <span :class="selected ? 'text-slate-900' : 'text-slate-400'">
+                <span x-text="selected || 'Pilih target level'"></span>
+            </span>
+            <svg :class="open ? 'rotate-180' : ''" class="h-4 w-4 text-slate-400 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+        </button>
+
+        <div x-show="open" x-transition @click.outside="open = false"
+            class="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg">
+            <template x-for="opt in options" :key="opt.value">
+                <button type="button" @click="select(opt.value)" :class="selected === opt.value ? 'bg-indigo-50' : 'hover:bg-slate-50'"
+                    class="flex w-full items-center gap-3 border-b border-slate-100 px-4 py-3 text-left last:border-0">
+                    <span class="text-sm text-slate-800" x-text="opt.value"></span>
+                </button>
+            </template>
+        </div>
+
+        @error('target_level') <p class="form-error">{{ $message }}</p> @enderror
+    </div>
+
+</div>
+
+{{-- Script Alpine untuk dropdown --}}
+<script>
+function levelSelect(name, oldValue) {
+    return {
+        open: false,
+        selected: oldValue || '',
+        options: [
+            { value: 'Beginner' },
+            { value: 'Intermediate' },
+            { value: 'Advanced' },
+        ],
+        select(val) {
+            this.selected = val;
+            this.open = false;
+        }
+    }
+}
+</script>
 
                 <div>
                     <label for="interest" class="form-label">Minat</label>

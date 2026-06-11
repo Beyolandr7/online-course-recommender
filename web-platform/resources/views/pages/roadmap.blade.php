@@ -116,11 +116,11 @@
                     </div>
 
                     <h2 class="mt-4 text-xl font-black text-slate-950">
-                        Roadmap belum tersedia
+                      Your roadmap isn't ready yet
                     </h2>
 
                     <p class="mx-auto mt-2 max-w-md text-sm font-medium leading-relaxed text-slate-500">
-                        Belum ada roadmap. Isi Preference Form dulu, lalu sistem akan menyimpan input kamu ke database dan membuat learning path dari rekomendasi FastAPI.
+                       Head over to the Preference Form to set up your learning goals — we'll build your roadmap from there.
                     </p>
                 </div>
             @else

@@ -9,13 +9,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LearningPath;
+use App\Models\Course;
 
 class PageController extends Controller
 {
 
 public function home(): View
 {
-    $courses = $this->getCoursesFromApi();
+    $courses = $this->getCoursesFromDatabase('', 5);
 
     $skillCategories = [
         'AI & Data',
@@ -29,28 +30,61 @@ public function home(): View
     ];
 
     return view('pages.home', [
-        'courses' => array_slice($courses, 0, 5),
+        'courses' => $courses,
         'skillCategories' => $skillCategories,
     ]);
 }
 
-private function getCoursesFromApi(string $query = '', string $level = ''): array
+private function getCoursesFromDatabase(string $query = '', ?int $limit = null): array
 {
-    try {
-        $apiUrl = env('AI_SERVICE_URL', 'http://127.0.0.1:8000');
-        $params = [];
-        if (!empty($query)) $params['q'] = $query;
-        $response = Http::timeout(10)->get("{$apiUrl}/courses", $params);
-        if ($response->successful()) {
-            $data = $response->json();
-            $courses = $data['courses'] ?? [];
-            return array_map(fn($c) => $this->mapCourseFromApi($c), $courses);
-        }
-        Log::error("AI service courses call failed: " . $response->body());
-    } catch (\Exception $e) {
-        Log::error("Failed to connect to AI service courses: " . $e->getMessage());
+    $courses = Course::query();
+
+    if (!empty($query)) {
+        $courses->where(function ($q) use ($query) {
+            $q->where('title', 'like', "%{$query}%")
+              ->orWhere('description', 'like', "%{$query}%")
+              ->orWhere('skills', 'like', "%{$query}%")
+              ->orWhere('platform', 'like', "%{$query}%")
+              ->orWhere('level', 'like', "%{$query}%");
+        });
     }
-    return [];
+
+    $courses->orderBy('dataset_index', 'asc');
+
+    if ($limit !== null) {
+        $courses->limit($limit);
+    }
+
+    return $courses
+        ->get()
+        ->map(function ($course) {
+            $category = $this->determineCategory([
+                'title' => $course->title,
+                'description' => $course->description,
+                'skills' => $course->skills,
+                'platform' => $course->platform,
+                'level' => $course->level,
+            ]);
+
+            $rawLevel = $course->level ?? null;
+            $level = ($rawLevel !== null && $rawLevel !== '') ? ucwords(strtolower($rawLevel)) : null;
+
+            return [
+                'id' => $course->id,
+                'course_id' => $course->id,
+                'dataset_index' => $course->dataset_index,
+                'title' => $course->title ?? 'Untitled Course',
+                'platform' => $course->platform ?? 'Online Course',
+                'level' => $level,
+                'match' => 0,
+                'category' => $category,
+                'thumbnail' => $this->determineThumbnail($category),
+                'description' => $course->description ?? '',
+                'url' => $course->url ?? '',
+                'skills' => $course->skills ?? '',
+            ];
+        })
+        ->toArray();
 }
 
 public function explore(): View
@@ -74,10 +108,9 @@ public function explore(): View
         }
 
         $recs = $interest ? $this->getRecommendations($interest, 50) : [];
-        $courses = collect(!empty($recs) ? $recs : $this->getCoursesFromApi($q));
+        $courses = collect(!empty($recs) ? $recs : $this->getCoursesFromDatabase($q));
     } else {
-        // Kirim $q langsung ke API supaya filtering dilakukan di sumber data
-        $courses = collect($this->getCoursesFromApi($q));
+        $courses = collect($this->getCoursesFromDatabase($q));
     }
 
     // Filter platform
@@ -124,7 +157,7 @@ public function explore(): View
 
    public function courseDetail(int $id, Request $request): View|RedirectResponse
 {
-    $course = $this->getCourseDetailFromApi($id);
+    $course = $this->getCourseDetailFromDatabase($id);
 
     if (!$course) {
         return redirect()->route('explore')->with('error', 'Course not found.');
@@ -205,17 +238,36 @@ public function explore(): View
         ]);
     }
 
-    public function updateProfile(Request $request): RedirectResponse
-    {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
-        ]);
+   public function updateProfile(Request $request): RedirectResponse
+{
+    $rules = [
+        'name'  => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email', 'max:255', 'unique:users,email,' . $request->user()->id],
+    ];
 
-        $request->user()->update($validated);
-
-        return redirect()->route('profile')->with('success', 'Profile updated successfully.');
+    // Tambah validasi password hanya kalau diisi
+    if ($request->filled('current_password')) {
+        $rules['current_password']      = ['required', 'current_password'];
+        $rules['password']              = ['required', 'min:8', 'confirmed'];
     }
+
+    $validated = $request->validate($rules);
+
+    // Update name & email
+    $request->user()->update([
+        'name'  => $validated['name'],
+        'email' => $validated['email'],
+    ]);
+
+    // Update password kalau diisi
+    if ($request->filled('current_password')) {
+        $request->user()->update([
+            'password' => bcrypt($validated['password']),
+        ]);
+    }
+
+    return redirect()->route('profile')->with('success', 'Profile updated successfully.');
+}
 
     public function roadmap(?LearningPath $learningPath = null): View|RedirectResponse
     {
@@ -352,23 +404,35 @@ public function explore(): View
         return [];
     }
 
-    private function getCourseDetailFromApi(int $courseId): ?array
-    {
-        try {
-            $apiUrl = env('AI_SERVICE_URL', 'http://127.0.0.1:8000');
-            $response = Http::timeout(5)->get("{$apiUrl}/courses/{$courseId}");
+    private function getCourseDetailFromDatabase(int $courseId): ?array
+{
+    $course = Course::find($courseId);
 
-            if ($response->successful()) {
-                $course = $response->json();
-                return $this->mapCourseFromApi($course);
-            }
-            Log::error("AI service get course call failed: " . $response->body());
-        } catch (\Exception $e) {
-            Log::error("Failed to connect to AI service: " . $e->getMessage());
-        }
-
+    if (!$course) {
         return null;
     }
+
+    $category = $this->determineCategory([
+        'title' => $course->title,
+        'description' => $course->description,
+        'skills' => $course->skills,
+        'platform' => $course->platform,
+        'level' => $course->level,
+    ]);
+
+    return [
+        'id' => $course->id,
+        'title' => $course->title,
+        'platform' => $course->platform ?? 'Online Course',
+        'level' => $course->level,
+        'match' => 0,
+        'category' => $category,
+        'thumbnail' => $this->determineThumbnail($category),
+        'description' => $course->description ?? '',
+        'url' => $course->url ?? '',
+        'skills' => $course->skills ?? '',
+    ];
+}
 
     private function mapCourseFromApi(array $apiCourse): array
     {
@@ -480,7 +544,7 @@ private function determineThumbnail(string $category): string
 
     public function goToCourse(int $id, Request $request)
     {
-        $course = $this->getCourseDetailFromApi($id);
+        $course = $this->getCourseDetailFromDatabase($id);
         if (!$course) {
             return redirect()->route('explore')->with('error', 'Course not found.');
         }
@@ -493,7 +557,7 @@ private function determineThumbnail(string $category): string
                 : $user->learningPaths()->latest()->first();
 
             if ($learningPath) {
-                $learningPath->startCourse($id); // ganti completeCourse → startCourse
+                $learningPath->startCourse($id); 
             }
         }
 

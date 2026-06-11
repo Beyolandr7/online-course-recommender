@@ -13,7 +13,7 @@
                 <x-icon name="arrow" class="h-4 w-4 rotate-180" /> Back to Home
             </a>
             <h1 class="text-4xl font-black tracking-tight text-slate-950 md:text-5xl">Explore Courses</h1>
-            <p class="mt-2 font-medium text-slate-500">Temukan kursus terbaik di berbagai kategori, level, dan durasi.</p>
+            <p class="mt-2 font-medium text-slate-500">Discover the best courses across various platforms and levels.</p>
 
             <form action="{{ route('explore') }}" method="GET"
                 class="mt-6 flex max-w-3xl overflow-hidden rounded-[24px] border border-indigo-100 bg-white shadow-sm focus-within:ring-4 focus-within:ring-indigo-100">
@@ -89,10 +89,9 @@
         Menampilkan <span class="font-bold text-slate-800">{{ count($courses) }}</span> kursus
         @if($searchQuery) untuk "<span class="text-indigo-700">{{ $searchQuery }}</span>"@endif
         @if($selectedSkill) · <span class="text-indigo-700">{{ $selectedSkill }}</span>@endif
-        @if($selectedLevel) · <span class="text-indigo-700">{{ $selectedLevel }}</span>@endif
     </p>
 
-    {{-- Course Grid --}}
+    {{-- Course Grid --}}   
     @if(count($courses) > 0)
         <div id="course-list" class="scroll-mt-24 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             @foreach($courses as $course)

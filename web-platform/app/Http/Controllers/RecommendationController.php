@@ -34,22 +34,21 @@ class RecommendationController extends Controller
 
         $recommendations = $this->fetchRecommendations($validated['interest']);
 
-        // Initialize status: first course is 'In Progress', others are 'Not Started'
-        foreach ($recommendations as $index => &$rec) {
-            $rec['status'] = ($index === 0) ? 'In Progress' : 'Not Started';
+        foreach ($recommendations as &$rec) {
+            $rec['status'] = 'Not Started';
         }
         unset($rec);
 
         $learningPath = LearningPath::create([
-            'user_id' => $request->user()->id,
-            'title' => $title,
-            'major' => $validated['major'],
-            'initial_level' => $validated['initial_level'],
-            'target_level' => $validated['target_level'],
-            'interest' => $validated['interest'],
-            'status' => 'in_progress',
-            'progress' => 0,
-            'recommended_courses' => $recommendations,
+            'user_id'              => $request->user()->id,
+            'title'                => $title,
+            'major'                => $validated['major'],
+            'initial_level'        => $validated['initial_level'],
+            'target_level'         => $validated['target_level'],
+            'interest'             => $validated['interest'],
+            'status'               => 'in_progress',
+            'progress'             => 0,
+            'recommended_courses'  => $recommendations,
         ]);
 
         return redirect()->route('roadmap.show', $learningPath);
