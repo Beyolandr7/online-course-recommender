@@ -16,5 +16,8 @@
     "dependencies": {
         "@alpinejs/persist": "^3.15.12",
         "alpinejs": "^3.15.12"
+    },
+    "overrides": {
+        "shell-quote": "^1.8.4"
     }
 }
