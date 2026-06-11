@@ -83,6 +83,12 @@ Buka tab terminal baru (biarkan server FastAPI tetap berjalan), dan masuk ke fol
     # Generate application key
     php artisan key:generate
 
+    # Install npm
+    npm install
+
+    # Jalankan vite
+    npm run dev
+
     # Jalankan server Laravel
     php artisan serve
 
