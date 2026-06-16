@@ -1,0 +1,28 @@
+# Dev tooling & local state
+node_modules
+.env
+.env.*
+!.env.example
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+
+# Git & IDE
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+.DS_Store
+
+# Tests & docs
+tests
+phpunit.xml
+README.md
+*.md
+
+# Build artifacts — handled by node-builder Docker stage, never copy local builds
+public/build
+public/hot
+public/storage
