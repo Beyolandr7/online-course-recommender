@@ -1,7 +1,7 @@
 @extends('layouts.dashboard')
 @section('title', 'Explore Courses | Pathly')
 @section('page-content')
-<div class="pt-16 lg:pt-0">
+<div class="pt-16 lg:pt-0" x-data="{ showTopicModal: false }">
 
     {{-- Hero Section --}}
     <section class="soft-card relative overflow-hidden p-7 md:p-9">
@@ -53,6 +53,14 @@
             class="filter-chip {{ $isRecommended ? 'bg-indigo-600! text-white! border-indigo-600!' : '' }}">
                 Sort: Recommended
             </a>
+
+            <button @click="showTopicModal = true"
+                    class="filter-chip inline-flex items-center gap-2 cursor-pointer transition {{ $selectedSkill ? 'bg-indigo-600! text-white! border-indigo-600!' : '' }}">
+                <span>Topic: {{ $selectedSkill ?: 'All' }}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
 
             @if($searchQuery || $selectedSkill || $selectedLevel || $selectedPlatform || $isRecommended)
                 <a href="{{ route('explore') }}" class="filter-chip border-red-200! text-red-500! hover:bg-red-50!">
@@ -196,6 +204,88 @@
         </div>
     @endif
 
+</div>
+
+{{-- Topic Filter Modal --}}
+<div x-show="showTopicModal"
+     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm"
+     x-transition:enter="transition ease-out duration-300"
+     x-transition:enter-start="opacity-0"
+     x-transition:enter-end="opacity-100"
+     x-transition:leave="transition ease-in duration-200"
+     x-transition:leave-start="opacity-100"
+     x-transition:leave-end="opacity-0"
+     @click.self="showTopicModal = false"
+     x-cloak>
+    
+    <div class="relative w-full max-w-xl rounded-[32px] border border-indigo-50 bg-white p-6 shadow-2xl md:p-8"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95">
+        
+        {{-- Header --}}
+        <div class="flex items-center justify-between border-b border-indigo-50 pb-4">
+            <h3 class="font-[Sora,sans-serif] text-xl font-black text-slate-950">
+                Filter by Topic
+            </h3>
+            <button @click="showTopicModal = false" class="rounded-xl p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        {{-- Topic Grid --}}
+        <div class="mt-6">
+            <p class="text-xs font-black uppercase tracking-widest text-slate-400 mb-3.5">Select a Topic</p>
+            <div class="flex flex-wrap gap-2.5">
+                @php
+                    $skillCategories = [
+                        'AI & Data',
+                        'IT & Cybersecurity',
+                        'Business & Management',
+                        'Health & Medical',
+                        'Design & Engineering',
+                        'Sustainability & Environment',
+                        'Creative & Media',
+                        'General Learning',
+                    ];
+                @endphp
+
+                {{-- All Topics option --}}
+                <a href="{{ route('explore', request()->except('skill')) }}"
+                   class="rounded-full border border-indigo-100 px-5 py-3 text-sm font-bold shadow-sm transition hover:border-indigo-300 hover:text-indigo-700
+                   {{ empty($selectedSkill) ? 'bg-indigo-600! text-white! border-indigo-600!' : 'bg-white text-slate-600' }}">
+                    All Topics
+                </a>
+
+                @foreach($skillCategories as $cat)
+                    <a href="{{ route('explore', array_merge(request()->except('skill'), ['skill' => $cat])) }}"
+                       class="rounded-full border border-indigo-100 px-5 py-3 text-sm font-bold shadow-sm transition hover:border-indigo-300 hover:text-indigo-700
+                       {{ $selectedSkill === $cat ? 'bg-indigo-600! text-white! border-indigo-600!' : 'bg-white text-slate-600' }}">
+                        {{ $cat }}
+                    </a>
+                @endforeach
+            </div>
+        </div>
+
+        {{-- Footer --}}
+        <div class="mt-8 flex justify-end gap-3 border-t border-indigo-50 pt-4">
+            @if($selectedSkill)
+                <a href="{{ route('explore', request()->except('skill')) }}"
+                   class="rounded-full border border-slate-200 bg-slate-50 px-5 py-2.5 text-xs font-black text-slate-600 hover:bg-slate-100 transition">
+                    Clear Topic Filter
+                </a>
+            @endif
+            <button @click="showTopicModal = false"
+                    class="rounded-full bg-indigo-600 px-5 py-2.5 text-xs font-black text-white hover:bg-indigo-700 transition cursor-pointer">
+                Apply Filter
+            </button>
+        </div>
+    </div>
 </div>
 
 @if($isRecommended)
