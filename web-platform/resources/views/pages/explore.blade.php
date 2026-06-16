@@ -1,5 +1,5 @@
 @extends('layouts.dashboard')
-@section('title', 'Explore Courses | CourseRecommend')
+@section('title', 'Explore Courses | Pathly')
 @section('page-content')
 <div class="pt-16 lg:pt-0">
 

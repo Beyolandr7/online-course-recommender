@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Sign Up | CourseRecommend')
+@section('title', 'Sign Up | Pathly')
 
 @section('page-content')
 <div class="mx-auto flex min-h-[80vh] max-w-5xl items-center justify-center pt-16 lg:pt-0">

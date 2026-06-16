@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Learning Roadmap | CourseRecommend')
+@section('title', 'Learning Roadmap | Pathly')
 
 @section('page-content')
 @php

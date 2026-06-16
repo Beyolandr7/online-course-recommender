@@ -1,5 +1,5 @@
 ---
-title: AI Course Recommender Web
+title: Pathly
 emoji: 🎓
 colorFrom: blue
 colorTo: indigo

@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Preference Form | CourseRecommend')
+@section('title', 'Preference Form | Pathly')
 
 @section('page-content')
     <div class="mx-auto max-w-5xl pt-16 lg:pt-0">

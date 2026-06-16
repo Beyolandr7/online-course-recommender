@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', $course['title'].' | CourseRecommend')
+@section('title', $course['title'].' | Pathly')
 
 @section('page-content')
 <div class="pt-16 lg:pt-0">

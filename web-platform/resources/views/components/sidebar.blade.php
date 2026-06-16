@@ -14,11 +14,11 @@ $navItems = [
     <div>
         <a href="{{ route('home') }}" class="flex items-center gap-3">
             <div class="grid h-10 w-10 place-items-center rounded-2xl bg-indigo-600 text-sm font-black text-white shadow-lg shadow-indigo-100">
-                CR
+                P
             </div>
 
             <div class="leading-tight">
-                <p class="text-base font-black tracking-tight text-slate-950">CourseRecommend</p>
+                <p class="text-base font-black tracking-tight text-slate-950">Pathly</p>
                 <p class="text-xs font-bold text-slate-400">AI Learning Platform</p>
             </div>
         </a>
@@ -66,10 +66,10 @@ $navItems = [
     <div class="flex items-center justify-between">
         <a href="{{ route('home') }}" class="flex items-center gap-3">
             <div class="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600 text-xs font-black text-white">
-                CRz
+                P
             </div>
             <div>
-                <p class="text-sm font-black text-slate-950">CourseRecommend</p>
+                <p class="text-sm font-black text-slate-950">Pathly</p>
                 <p class="text-[11px] font-bold text-slate-400">AI Learning Platform</p>
             </div>
         </a>
