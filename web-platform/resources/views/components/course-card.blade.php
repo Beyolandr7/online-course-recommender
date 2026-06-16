@@ -37,9 +37,6 @@
 
                 <div class="flex flex-wrap items-center gap-2 text-sm text-slate-500">
 
-                    <x-icon name="star"
-                            class="h-4 w-4 text-amber-400" />    
-
                     <span>
                         {{ $course['platform'] }}
                     </span>

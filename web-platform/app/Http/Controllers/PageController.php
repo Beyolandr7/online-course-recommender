@@ -568,7 +568,8 @@ private function determineCategory(array $course): string
 
     foreach ($categoryKeywords as $category => $keywords) {
         foreach ($keywords as $keyword) {
-            if (str_contains($text, strtolower($keyword))) {
+            $pattern = '/\b' . preg_quote(strtolower($keyword), '/') . '\b/';
+            if (preg_match($pattern, $text)) {
                 return $category;
             }
         }
