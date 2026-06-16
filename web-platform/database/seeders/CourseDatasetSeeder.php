@@ -33,6 +33,7 @@ class CourseDatasetSeeder extends Seeder
 
         $total = 0;
         $index = 0;
+        $chunks = [];
 
         while (($row = fgetcsv($file)) !== false) {
             if (count($row) !== count($headers)) {
@@ -42,7 +43,7 @@ class CourseDatasetSeeder extends Seeder
 
             $data = array_combine($headers, $row);
 
-            Course::create([
+            $chunks[] = [
                 'dataset_index' => $index,
                 'title' => $data['course_title'] ?? null,
                 'description' => $data['description'] ?? null,
@@ -51,10 +52,21 @@ class CourseDatasetSeeder extends Seeder
                 'url' => $data['url'] ?? null,
                 'platform' => $data['platform'] ?? null,
                 'combined_features' => $data['combined_features'] ?? null,
-            ]);
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
 
             $index++;
             $total++;
+
+            if (count($chunks) >= 1000) {
+                Course::insert($chunks);
+                $chunks = [];
+            }
+        }
+
+        if (count($chunks) > 0) {
+            Course::insert($chunks);
         }
 
         fclose($file);

@@ -14,13 +14,13 @@ php artisan view:cache
 echo "==> Running database migrations..."
 php artisan migrate --force
 
-# Only seed if the courses table is empty (avoids re-seeding on every restart)
+# Only seed if the courses table is empty or incomplete (total expected is 62154)
 COURSE_COUNT=$(php artisan tinker --execute="echo \App\Models\Course::count();" 2>/dev/null | tr -d '[:space:]')
-if [ "$COURSE_COUNT" = "0" ] || [ -z "$COURSE_COUNT" ]; then
-    echo "==> Seeding course dataset (first boot)..."
+if [ -z "$COURSE_COUNT" ] || [ "$COURSE_COUNT" -lt "60000" ]; then
+    echo "==> Seeding course dataset (first boot or incomplete: $COURSE_COUNT rows)..."
     php artisan db:seed --force
 else
-    echo "==> Courses already seeded ($COURSE_COUNT rows), skipping."
+    echo "==> Courses already fully seeded ($COURSE_COUNT rows), skipping."
 fi
 
 echo "==> Starting Apache..."
