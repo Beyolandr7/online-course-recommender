@@ -110,7 +110,7 @@ public function explore(): View
         $recs = $interest ? $this->getRecommendations($interest, 50) : [];
         $courses = collect(!empty($recs) ? $recs : $this->getCoursesFromDatabase($q));
     } else {
-        $courses = collect($this->getCoursesFromDatabase($q));
+        $courses = collect($this->getCoursesFromDatabase($q, 30));
     }
 
     // Filter platform
@@ -379,7 +379,7 @@ public function explore(): View
     private function getRecommendations(string $interest, int $limit = 6): array
     {
         try {
-            $apiUrl = env('AI_SERVICE_URL', 'http://127.0.0.1:8000');
+            $apiUrl = rtrim(env('AI_SERVICE_URL', 'http://127.0.0.1:8000'), '/');
             $response = Http::timeout(15)->post("{$apiUrl}/recommend", [
                 'user_id' => '1',
                 'interest' => $interest,
@@ -531,7 +531,8 @@ private function determineThumbnail(string $category): string
 {
     $basePath = 'assets/course-thumbnails/';
 
-    $fileName = str_replace(' & ', '-', $category) . '.svg';
+    // Use lowercase filename to match actual files on Linux (case-sensitive filesystem)
+    $fileName = strtolower(str_replace(' & ', '-', $category)) . '.svg';
 
     $thumbnail = $basePath . $fileName;
 
@@ -539,7 +540,8 @@ private function determineThumbnail(string $category): string
         return $thumbnail;
     }
 
-    return $basePath . 'General-Learning.svg';
+    // Fallback to general-learning (lowercase to match actual file)
+    return $basePath . 'general-learning.svg';
 }
 
     public function goToCourse(int $id, Request $request)

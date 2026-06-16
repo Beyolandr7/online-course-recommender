@@ -191,13 +191,15 @@ class RecommendationService
     private function determineThumbnail(string $category): string
     {
         $basePath = 'assets/course-thumbnails/';
-        $fileName = str_replace(' & ', '-', $category) . '.svg';
+        // Use lowercase filename to match actual files on Linux (case-sensitive filesystem)
+        $fileName = strtolower(str_replace(' & ', '-', $category)) . '.svg';
         $thumbnail = $basePath . $fileName;
 
         if (file_exists(public_path($thumbnail))) {
             return $thumbnail;
         }
 
-        return $basePath . 'General-Learning.svg';
+        // Fallback (lowercase to match actual file)
+        return $basePath . 'general-learning.svg';
     }
 }
