@@ -128,7 +128,7 @@ function levelSelect(name, oldValue) {
                     @error('interest') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
 
-                <button class="primary-btn w-full py-4 text-base">
+                <button id="submit-btn" type="submit" class="primary-btn w-full py-4 text-base">
                     Generate Recommendation
                 </button>
             </form>
@@ -136,4 +136,117 @@ function levelSelect(name, oldValue) {
         </div>
     </section>
 </div>
+
+{{-- ── Full-screen AI Loading Overlay ────────────────────────────────────── --}}
+<div id="loading-overlay"
+     class="fixed inset-0 z-[999] hidden items-center justify-center bg-white/60 backdrop-blur-md"
+     aria-live="polite" aria-label="Generating recommendations">
+
+    <div class="flex flex-col items-center gap-6 px-6 text-center">
+
+        {{-- Animated ring + icon --}}
+        <div class="relative flex h-28 w-28 items-center justify-center">
+            {{-- Outer spinning ring --}}
+            <svg class="absolute inset-0 h-full w-full animate-spin" viewBox="0 0 100 100" fill="none">
+                <circle cx="50" cy="50" r="44" stroke="#e0e7ff" stroke-width="8"/>
+                <circle cx="50" cy="50" r="44"
+                        stroke="url(#ring-grad)" stroke-width="8"
+                        stroke-linecap="round"
+                        stroke-dasharray="138 138"
+                        stroke-dashoffset="104"/>
+                <defs>
+                    <linearGradient id="ring-grad" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                        <stop offset="0%" stop-color="#6366f1"/>
+                        <stop offset="100%" stop-color="#a78bfa"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            {{-- Centre sparkle --}}
+            <div class="flex h-16 w-16 items-center justify-center rounded-full bg-indigo-600 shadow-lg shadow-indigo-300">
+                <svg class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"/>
+                </svg>
+            </div>
+        </div>
+
+        {{-- Headline --}}
+        <div>
+            <h2 class="text-2xl font-black text-slate-900">Generating your recommendations…</h2>
+            <p class="mt-1.5 text-sm font-medium text-slate-500">Our AI is finding the best courses for you</p>
+        </div>
+
+        {{-- Animated status messages --}}
+        <p id="loading-status" class="min-h-[1.5rem] text-sm font-semibold text-indigo-600 transition-opacity duration-500"></p>
+
+        {{-- Bouncing dots --}}
+        <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 animate-bounce rounded-full bg-indigo-400 [animation-delay:0ms]"></span>
+            <span class="h-2.5 w-2.5 animate-bounce rounded-full bg-indigo-500 [animation-delay:150ms]"></span>
+            <span class="h-2.5 w-2.5 animate-bounce rounded-full bg-indigo-600 [animation-delay:300ms]"></span>
+        </div>
+
+    </div>
+</div>
+
+<script>
+(function () {
+    const form    = document.querySelector('form[action*="preferences"]');
+    const overlay = document.getElementById('loading-overlay');
+    const statusEl= document.getElementById('loading-status');
+    const btn     = document.getElementById('submit-btn');
+
+    const messages = [
+        'Analysing your interests…',
+        'Searching across 60,000+ courses…',
+        'Matching your skill level…',
+        'Ranking top recommendations…',
+        'Almost there…',
+        'Putting the finishing touches…',
+    ];
+
+    let msgIndex   = 0;
+    let msgInterval;
+
+    function showNextMessage() {
+        // Fade out → update text → fade in
+        statusEl.style.opacity = '0';
+        setTimeout(() => {
+            statusEl.textContent = messages[msgIndex % messages.length];
+            statusEl.style.opacity = '1';
+            msgIndex++;
+        }, 300);
+    }
+
+    function showOverlay() {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        btn.disabled = true;
+        btn.classList.add('opacity-60', 'cursor-not-allowed');
+
+        // Show first message immediately, then cycle
+        showNextMessage();
+        msgInterval = setInterval(showNextMessage, 2800);
+    }
+
+    if (form && overlay) {
+        form.addEventListener('submit', function (e) {
+            // Only show overlay if basic browser validation passes
+            if (!form.checkValidity()) return;
+            showOverlay();
+        });
+    }
+
+    // Safety: hide overlay when browser navigates back to this page (bfcache)
+    window.addEventListener('pageshow', function (e) {
+        if (e.persisted) {
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+            if (btn) { btn.disabled = false; btn.classList.remove('opacity-60', 'cursor-not-allowed'); }
+            clearInterval(msgInterval);
+        }
+    });
+})();
+</script>
+
 @endsection
