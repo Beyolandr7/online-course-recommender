@@ -61,6 +61,9 @@ RUN a2enmod rewrite
 # Point Apache document root to Laravel's /public folder
 RUN sed -i 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
 
+# Change Apache to listen on port 7860 (required by Hugging Face Spaces)
+RUN sed -i 's/80/7860/g' /etc/apache2/ports.conf /etc/apache2/sites-available/000-default.conf
+
 # Allow .htaccess overrides (required for Laravel routing)
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
@@ -80,9 +83,9 @@ COPY --from=node-builder /app/public/build ./public/build
 # Generate optimised class map (scripts skipped in composer stage, safe to run now)
 RUN composer dump-autoload --optimize --no-dev --no-scripts
 
-# Fix storage and cache permissions
+# Fix storage and cache permissions (777 to allow any runtime user on Hugging Face Spaces)
 RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+    && chmod -R 777 storage bootstrap/cache
 
 # Create .env from example if it doesn't exist
 # Real values are injected by Render as environment variables
@@ -100,5 +103,5 @@ RUN php artisan config:cache \
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-EXPOSE 80
+EXPOSE 7860
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
