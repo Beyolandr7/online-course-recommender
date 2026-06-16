@@ -1,8 +1,9 @@
 fastapi
-uvicorn
+uvicorn[standard]
 pandas
 numpy
 scikit-learn
 torch
 transformers
 sentence-transformers
+pydantic>=1.10,<3
