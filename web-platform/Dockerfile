@@ -43,6 +43,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libonig-dev \
         libxml2-dev \
+        ca-certificates \
     && docker-php-ext-install \
         pdo_mysql \
         zip \
