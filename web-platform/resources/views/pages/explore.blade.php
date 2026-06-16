@@ -50,12 +50,12 @@
         {{-- Row 1: Action chips --}}
         <div class="flex flex-wrap gap-3">
             <a href="{{ route('explore', array_merge(request()->except('sort'), $isRecommended ? [] : ['sort' => 'recommended'])) }}"
-            class="filter-chip {{ $isRecommended ? 'bg-indigo-600 !text-white border-indigo-600' : '' }}">
+            class="filter-chip {{ $isRecommended ? 'bg-indigo-600 text-white! border-indigo-600' : '' }}">
                 Sort: Recommended
             </a>
 
             @if($searchQuery || $selectedSkill || $selectedLevel || $selectedPlatform || $isRecommended)
-                <a href="{{ route('explore') }}" class="filter-chip !border-red-200 !text-red-500 hover:!bg-red-50">
+                <a href="{{ route('explore') }}" class="filter-chip border-red-200! text-red-500! hover:bg-red-50!">
                     Reset
                 </a>
             @endif
@@ -66,17 +66,17 @@
             <span class="text-sm font-bold text-slate-500">Platform:</span>
 
             <a href="{{ route('explore', request()->except('platform')) }}"
-            class="filter-chip {{ empty($selectedPlatform) ? 'bg-indigo-600 !text-white border-indigo-600' : '' }}">
+            class="filter-chip {{ empty($selectedPlatform) ? 'bg-indigo-600 text-white! border-indigo-600' : '' }}">
                 All
             </a>
 
             <a href="{{ route('explore', array_merge(request()->except('platform'), ['platform' => 'Coursera'])) }}"
-            class="filter-chip {{ $selectedPlatform === 'Coursera' ? 'bg-indigo-600 !text-white border-indigo-600' : '' }}">
+            class="filter-chip {{ $selectedPlatform === 'Coursera' ? 'bg-indigo-600 text-white! border-indigo-600' : '' }}">
                 Coursera
             </a>
 
             <a href="{{ route('explore', array_merge(request()->except('platform'), ['platform' => 'edX'])) }}"
-            class="filter-chip {{ $selectedPlatform === 'edX' ? 'bg-indigo-600 !text-white border-indigo-600' : '' }}">
+            class="filter-chip {{ $selectedPlatform === 'edX' ? 'bg-indigo-600 text-white! border-indigo-600' : '' }}">
                 edX
             </a>
         </div>
