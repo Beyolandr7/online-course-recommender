@@ -2,7 +2,7 @@
 
 Sebuah platform web cerdas berbasis **Microservices Architecture** yang memanfaatkan _Artificial Intelligence_ (AI) untuk merekomendasikan kursus daring (online course) secara personal. Sistem ini dibangun untuk mengatasi kebingungan pengguna di tengah melimpahnya pilihan platform e-learning serta menekan angka putus belajar (dropout rate).
 
-Proyek ini merupakan hasil kolaborasi tim **PJK-GM078** untuk program Capstone Project Pijar x IBM SkillsBuild.
+Proyek ini merupakan hasil kolaborasi tim **PJK-GM078** untuk program Capstone Project Pijak x IBM SkillsBuild.
 
 ---
 
