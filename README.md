@@ -66,7 +66,7 @@ Buka terminal baru dan masuk ke folder servis AI:
     # Jalankan server FastAPI
     uvicorn main:app --reload --port 8001
 
-_API Machine Learning sekarang berjalan di `http://localhost:8001` (Cek dokumentasi interaktif di `http://localhost:8001/docs`)._
+_API Machine Learning sekarang berjalan di `http://localhost:8001`._
 
 ### Setup Web Platform (Laravel 12)
 
