@@ -106,9 +106,14 @@ private function getCoursesFromDatabase(string $query = '', ?int $limit = null):
     return $courses->get()->map(fn($c) => $this->mapCourseModel($c))->toArray();
 }
 
-public function explore(): View
+public function explore(): View|RedirectResponse
 {
     $isRecommended = request('sort') === 'recommended';
+    
+    if ($isRecommended && !Auth::check()) {
+        return redirect()->route('login');
+    }
+
     $q             = request('q', '');
     $skill         = request('skill', '');
     $platform      = request('platform');
@@ -117,14 +122,7 @@ public function explore(): View
 
     // ── AI Recommendation path (collection paginate) ──────────────────────
     if ($isRecommended) {
-        $interest = '';
-        if (Auth::check()) {
-            $interest = Auth::user()->learningPaths()->latest()->value('interest') ?? '';
-        }
-        if (!$interest && session()->has('user_preferences')) {
-            $interest = session('user_preferences')['interest'] ?? '';
-        }
-
+        $interest = Auth::user()->learningPaths()->latest()->value('interest') ?? '';
         $recs    = $interest ? $this->getRecommendations($interest, 100) : [];
         $courses = collect(!empty($recs) ? $recs : $this->getCoursesFromDatabase($q, 30));
 

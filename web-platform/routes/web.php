@@ -13,8 +13,6 @@ Route::get('/explore', [PageController::class, 'explore'])->name('explore');
 Route::get('/course/{id}', [PageController::class, 'courseDetail'])->name('course.detail');
 Route::get('/course/{id}/go', [PageController::class, 'goToCourse'])->name('course.go');
 
-Route::get('/preferences', [RecommendationController::class, 'create'])->name('preferences.create');
-
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [PageController::class, 'profile'])->name('profile');
     Route::put('/profile', [PageController::class, 'updateProfile'])->name('profile.update');
@@ -25,6 +23,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/my-learning', [PageController::class, 'myLearning'])->name('my-learning');
 
+    Route::get('/preferences', [RecommendationController::class, 'create'])->name('preferences.create');
     Route::post('/preferences', [RecommendationController::class, 'store'])->name('preferences.store');
 });
 
