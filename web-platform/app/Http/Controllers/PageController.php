@@ -35,6 +35,57 @@ public function home(): View
     ]);
 }
 
+/**
+ * Map a Course Eloquent model to the standard course array format.
+ */
+private function mapCourseModel(Course $course): array
+{
+    $category = $this->determineCategory([
+        'title'       => $course->title,
+        'description' => $course->description,
+        'skills'      => $course->skills,
+        'platform'    => $course->platform,
+        'level'       => $course->level,
+    ]);
+
+    $rawLevel = $course->level ?? null;
+    $level    = ($rawLevel !== null && $rawLevel !== '') ? ucwords(strtolower($rawLevel)) : null;
+
+    return [
+        'id'            => $course->id,
+        'course_id'     => $course->id,
+        'dataset_index' => $course->dataset_index,
+        'title'         => $course->title ?? 'Untitled Course',
+        'platform'      => $course->platform ?? 'Online Course',
+        'level'         => $level,
+        'match'         => 0,
+        'category'      => $category,
+        'thumbnail'     => $this->determineThumbnail($category),
+        'description'   => $course->description ?? '',
+        'url'           => $course->url ?? '',
+        'skills'        => $course->skills ?? '',
+    ];
+}
+
+/**
+ * Returns the SQL-filterable keywords for a skill category.
+ */
+private function getCategoryKeywords(string $skill): array
+{
+    $map = [
+        'Health & Medical'            => ['health', 'medical', 'medicine', 'anatomy', 'physiology', 'cardiology', 'clinical', 'healthcare'],
+        'AI & Data'                   => ['data science', 'machine learning', 'deep learning', 'artificial intelligence', 'statistics', 'analytics'],
+        'IT & Cybersecurity'          => ['cybersecurity', 'cyber security', 'network security', 'computer networking', 'firewall', 'cloud computing', 'information technology'],
+        'Business & Management'       => ['business', 'management', 'marketing', 'finance', 'entrepreneurship', 'strategy', 'leadership', 'project management'],
+        'Design & Engineering'        => ['design', 'engineering', 'cad', 'architecture', 'mechanical', 'civil', 'manufacturing'],
+        'Sustainability & Environment'=> ['sustainability', 'environment', 'energy transition', 'climate', 'renewable'],
+        'Creative & Media'            => ['creative', 'media', 'video', 'photography', 'music', 'animation', 'film', 'game design'],
+        'General Learning'            => [],
+    ];
+
+    return $map[$skill] ?? [];
+}
+
 private function getCoursesFromDatabase(string $query = '', ?int $limit = null): array
 {
     $courses = Course::query();
@@ -42,10 +93,7 @@ private function getCoursesFromDatabase(string $query = '', ?int $limit = null):
     if (!empty($query)) {
         $courses->where(function ($q) use ($query) {
             $q->where('title', 'like', "%{$query}%")
-              ->orWhere('description', 'like', "%{$query}%")
-              ->orWhere('skills', 'like', "%{$query}%")
-              ->orWhere('platform', 'like', "%{$query}%")
-              ->orWhere('level', 'like', "%{$query}%");
+              ->orWhere('skills', 'like', "%{$query}%");
         });
     }
 
@@ -55,102 +103,107 @@ private function getCoursesFromDatabase(string $query = '', ?int $limit = null):
         $courses->limit($limit);
     }
 
-    return $courses
-        ->get()
-        ->map(function ($course) {
-            $category = $this->determineCategory([
-                'title' => $course->title,
-                'description' => $course->description,
-                'skills' => $course->skills,
-                'platform' => $course->platform,
-                'level' => $course->level,
-            ]);
-
-            $rawLevel = $course->level ?? null;
-            $level = ($rawLevel !== null && $rawLevel !== '') ? ucwords(strtolower($rawLevel)) : null;
-
-            return [
-                'id' => $course->id,
-                'course_id' => $course->id,
-                'dataset_index' => $course->dataset_index,
-                'title' => $course->title ?? 'Untitled Course',
-                'platform' => $course->platform ?? 'Online Course',
-                'level' => $level,
-                'match' => 0,
-                'category' => $category,
-                'thumbnail' => $this->determineThumbnail($category),
-                'description' => $course->description ?? '',
-                'url' => $course->url ?? '',
-                'skills' => $course->skills ?? '',
-            ];
-        })
-        ->toArray();
+    return $courses->get()->map(fn($c) => $this->mapCourseModel($c))->toArray();
 }
 
 public function explore(): View
 {
     $isRecommended = request('sort') === 'recommended';
-    $q = request('q', '');        // default empty string
-    $skill = request('skill', '');
-    $level = request('level', '');
-    $platform = request('platform');
+    $q             = request('q', '');
+    $skill         = request('skill', '');
+    $platform      = request('platform');
+    $level         = request('level', '');
+    $perPage       = 30;
 
+    // ── AI Recommendation path (collection paginate) ──────────────────────
     if ($isRecommended) {
         $interest = '';
-
         if (Auth::check()) {
             $interest = Auth::user()->learningPaths()->latest()->value('interest') ?? '';
         }
-
         if (!$interest && session()->has('user_preferences')) {
-            $preferences = session('user_preferences');
-            $interest = $preferences['interest'] ?? '';
+            $interest = session('user_preferences')['interest'] ?? '';
         }
 
-        $recs = $interest ? $this->getRecommendations($interest, 50) : [];
-        $courses = collect(!empty($recs) ? $recs : $this->getCoursesFromDatabase($q));
-    } else {
-        $courses = collect($this->getCoursesFromDatabase($q, 30));
+        $recs    = $interest ? $this->getRecommendations($interest, 100) : [];
+        $courses = collect(!empty($recs) ? $recs : $this->getCoursesFromDatabase($q, 30));
+
+        if (!empty($platform)) {
+            $courses = $courses->filter(fn($c) => strtolower($c['platform'] ?? '') === strtolower($platform));
+        }
+        if (!empty($skill)) {
+            $courses = $courses->filter(fn($c) => ($c['category'] ?? 'General Learning') === $skill);
+        }
+
+        $courses     = $courses->sortByDesc('match')->values();
+        $total       = $courses->count();
+        $currentPage = (int) request('page', 1);
+        $lastPage    = max(1, (int) ceil($total / $perPage));
+        $paginated   = $courses->forPage($currentPage, $perPage)->values()->toArray();
+
+        return view('pages.explore', [
+            'courses'          => $paginated,
+            'isRecommended'    => true,
+            'searchQuery'      => $q,
+            'selectedSkill'    => $skill,
+            'selectedLevel'    => $level,
+            'selectedPlatform' => $platform,
+            'pagination'       => compact('total', 'currentPage', 'lastPage', 'perPage'),
+        ]);
     }
 
-    // Filter platform
-    if (!empty($platform)) {
-        $courses = $courses->filter(function ($course) use ($platform) {
-            return strtolower($course['platform'] ?? '') === strtolower($platform);
-        });
-    }
+    // ── Normal browse path (SQL paginate) ─────────────────────────────────
+    $query = Course::query();
 
-    if (!empty($skill)) {
-    $courses = $courses->filter(function ($course) use ($skill) {
-        return ($course['category'] ?? 'General Learning') === $skill;
-    });
-    }
-    // fallback 
+    // Text search — only title + skills for speed
     if (!empty($q)) {
-        $courses = $courses->filter(function ($course) use ($q) {
-            $keyword = strtolower($q);
-            $text = strtolower(
-                ($course['title'] ?? '') . ' ' .
-                ($course['description'] ?? '') . ' ' .
-                ($course['skills'] ?? '') . ' ' .
-                ($course['platform'] ?? '') . ' ' .
-                ($course['level'] ?? '')
-            );
-            return str_contains($text, $keyword);
+        $query->where(function ($qb) use ($q) {
+            $qb->where('title', 'like', "%{$q}%")
+               ->orWhere('skills', 'like', "%{$q}%");
         });
     }
 
-    if ($isRecommended) {
-        $courses = $courses->sortByDesc('match');
+    // Platform filter (exact match, indexed-friendly)
+    if (!empty($platform)) {
+        $query->where('platform', $platform);
     }
+
+    // Skill/category filter — translated to keyword OR-LIKE conditions
+    if (!empty($skill)) {
+        $keywords = $this->getCategoryKeywords($skill);
+        if (!empty($keywords)) {
+            $query->where(function ($qb) use ($keywords) {
+                foreach ($keywords as $kw) {
+                    $qb->orWhere('title', 'like', "%{$kw}%")
+                       ->orWhere('skills', 'like', "%{$kw}%");
+                }
+            });
+        }
+    }
+
+    $query->orderBy('dataset_index', 'asc');
+    $paginator = $query->paginate($perPage, ['*'], 'page', request('page', 1));
+
+    $courses = $paginator->getCollection()
+        ->map(fn($c) => $this->mapCourseModel($c))
+        ->values()
+        ->toArray();
+
+    $pagination = [
+        'total'       => $paginator->total(),
+        'currentPage' => $paginator->currentPage(),
+        'lastPage'    => $paginator->lastPage(),
+        'perPage'     => $perPage,
+    ];
 
     return view('pages.explore', [
-        'courses'       => $courses->values()->toArray(),
-        'isRecommended' => $isRecommended,
-        'searchQuery'   => $q,
-        'selectedSkill' => $skill,
-        'selectedLevel' => $level,
+        'courses'          => $courses,
+        'isRecommended'    => false,
+        'searchQuery'      => $q,
+        'selectedSkill'    => $skill,
+        'selectedLevel'    => $level,
         'selectedPlatform' => $platform,
+        'pagination'       => $pagination,
     ]);
 }
 

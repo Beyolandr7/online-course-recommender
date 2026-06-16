@@ -84,12 +84,16 @@
 
     </div>
 
-    {{-- Result count --}}
-    <p class="mb-4 text-sm font-medium text-slate-500">
-        Menampilkan <span class="font-bold text-slate-800">{{ count($courses) }}</span> kursus
-        @if($searchQuery) untuk "<span class="text-indigo-700">{{ $searchQuery }}</span>"@endif
-        @if($selectedSkill) · <span class="text-indigo-700">{{ $selectedSkill }}</span>@endif
-    </p>
+    {{-- Result count + page info --}}
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm font-medium text-slate-500">
+            Menampilkan <span class="font-bold text-slate-800">{{ count($courses) }}</span> kursus
+            @if($searchQuery) untuk "<span class="text-indigo-700">{{ $searchQuery }}</span>"@endif
+            @if($selectedSkill) · <span class="text-indigo-700">{{ $selectedSkill }}</span>@endif
+            &nbsp;·&nbsp; halaman <span class="font-bold text-slate-800">{{ $pagination['currentPage'] }}</span> dari <span class="font-bold text-slate-800">{{ $pagination['lastPage'] }}</span>
+            ({{ number_format($pagination['total']) }} total)
+        </p>
+    </div>
 
     {{-- Course Grid --}}   
     @if(count($courses) > 0)
@@ -117,6 +121,78 @@
                     Reset
                 </a>
             </div>
+        </div>
+    @endif
+
+    {{-- Pagination Controls --}}
+    @if($pagination['lastPage'] > 1)
+        @php
+            $prevPage = max(1, $pagination['currentPage'] - 1);
+            $nextPage = min($pagination['lastPage'], $pagination['currentPage'] + 1);
+            $hasPrev  = $pagination['currentPage'] > 1;
+            $hasNext  = $pagination['currentPage'] < $pagination['lastPage'];
+
+            $pageParams = array_merge(request()->except('page'), []);
+        @endphp
+        <div class="mt-10 flex items-center justify-center gap-3">
+
+            {{-- Previous --}}
+            @if($hasPrev)
+                <a href="{{ route('explore', array_merge($pageParams, ['page' => $prevPage])) }}"
+                   class="inline-flex items-center gap-2 rounded-2xl border border-indigo-100 bg-white px-5 py-3 text-sm font-black text-indigo-700 shadow-sm transition hover:bg-indigo-50 hover:-translate-x-0.5">
+                    ← Sebelumnya
+                </a>
+            @else
+                <span class="inline-flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-5 py-3 text-sm font-black text-slate-300 cursor-not-allowed">
+                    ← Sebelumnya
+                </span>
+            @endif
+
+            {{-- Page numbers (show window of 5 around current) --}}
+            @php
+                $window = 2;
+                $start  = max(1, $pagination['currentPage'] - $window);
+                $end    = min($pagination['lastPage'], $pagination['currentPage'] + $window);
+            @endphp
+
+            @if($start > 1)
+                <a href="{{ route('explore', array_merge($pageParams, ['page' => 1])) }}"
+                   class="hidden sm:inline-flex items-center justify-center w-10 h-10 rounded-xl border border-indigo-100 bg-white text-sm font-black text-slate-600 shadow-sm transition hover:bg-indigo-50">1</a>
+                @if($start > 2)
+                    <span class="hidden sm:inline text-slate-400 font-bold">…</span>
+                @endif
+            @endif
+
+            @for($p = $start; $p <= $end; $p++)
+                <a href="{{ route('explore', array_merge($pageParams, ['page' => $p])) }}"
+                   class="hidden sm:inline-flex items-center justify-center w-10 h-10 rounded-xl text-sm font-black shadow-sm transition
+                          {{ $p === $pagination['currentPage']
+                             ? 'bg-indigo-600 text-white border border-indigo-600'
+                             : 'border border-indigo-100 bg-white text-slate-600 hover:bg-indigo-50' }}">
+                    {{ $p }}
+                </a>
+            @endfor
+
+            @if($end < $pagination['lastPage'])
+                @if($end < $pagination['lastPage'] - 1)
+                    <span class="hidden sm:inline text-slate-400 font-bold">…</span>
+                @endif
+                <a href="{{ route('explore', array_merge($pageParams, ['page' => $pagination['lastPage']])) }}"
+                   class="hidden sm:inline-flex items-center justify-center w-10 h-10 rounded-xl border border-indigo-100 bg-white text-sm font-black text-slate-600 shadow-sm transition hover:bg-indigo-50">{{ $pagination['lastPage'] }}</a>
+            @endif
+
+            {{-- Next --}}
+            @if($hasNext)
+                <a href="{{ route('explore', array_merge($pageParams, ['page' => $nextPage])) }}"
+                   class="inline-flex items-center gap-2 rounded-2xl border border-indigo-100 bg-white px-5 py-3 text-sm font-black text-indigo-700 shadow-sm transition hover:bg-indigo-50 hover:translate-x-0.5">
+                    Selanjutnya →
+                </a>
+            @else
+                <span class="inline-flex items-center gap-2 rounded-2xl border border-slate-100 bg-slate-50 px-5 py-3 text-sm font-black text-slate-300 cursor-not-allowed">
+                    Selanjutnya →
+                </span>
+            @endif
+
         </div>
     @endif
 
