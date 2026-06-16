@@ -1,19 +1,19 @@
-# 🎓 Online Course Recommendation System (PJK-GM078)
+# Online Course Recommendation System (PJK-GM078)
 
-Sebuah platform web cerdas berbasis **Microservices Architecture** yang memanfaatkan _Artificial Intelligence_ (AI) untuk merekomendasikan kursus daring (_online course_) secara personal. Sistem ini dibangun untuk mengatasi kebingungan pengguna di tengah melimpahnya pilihan _platform e-learning_ serta menekan angka putus belajar (_dropout rate_).
+Sebuah platform web cerdas berbasis **Microservices Architecture** yang memanfaatkan _Artificial Intelligence_ (AI) untuk merekomendasikan kursus daring (online course) secara personal. Sistem ini dibangun untuk mengatasi kebingungan pengguna di tengah melimpahnya pilihan platform e-learning serta menekan angka putus belajar (dropout rate).
 
 Proyek ini merupakan hasil kolaborasi tim **PJK-GM078** untuk program Capstone Project Pijar x IBM SkillsBuild.
 
 ---
 
-## ✨ Fitur Utama
+## Fitur Utama
 
-- **Cross-Platform Catalog:** Menggabungkan dataset publik dari Coursera dan Udemy untuk menghasilkan rekomendasi yang bervariasi dan utuh.
-- **Microservice Architecture:** Pemisahan tugas secara efisien antara Laravel (logika web & autentikasi pengguna) dan FastAPI (pemrosesan analitik dan _Machine Learning_).
+- **Cross-Platform Catalog:** untuk Menggabungkan dataset publik dari Coursera dan Udemy untuk menghasilkan rekomendasi yang bervariasi dan utuh.
+- **Microservice Architecture:** sebagai Pemisahan tugas secara efisien antara Laravel (logika web & autentikasi pengguna) dan FastAPI (pemrosesan analitik dan _Machine Learning_).
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## Teknologi yang Digunakan
 
 **Web Platform (Main Backend & Frontend)**
 
@@ -29,7 +29,7 @@ Proyek ini merupakan hasil kolaborasi tim **PJK-GM078** untuk program Capstone P
 
 ---
 
-## 📂 Struktur Repositori (Monorepo)
+## Struktur Repositori (Monorepo)
 
     online-course-recommender/
     ├── web-platform/       # Proyek Web Laravel (UI & Logic)
@@ -39,7 +39,7 @@ Proyek ini merupakan hasil kolaborasi tim **PJK-GM078** untuk program Capstone P
 
 ---
 
-## 🚀 Panduan Instalasi (Localhost)
+## Panduan Instalasi (Localhost)
 
 Pastikan laptop Anda sudah terinstal **PHP 8.2+**, **Composer**, **Python 3.10+**, dan **Git**.
 
@@ -68,16 +68,16 @@ Buka terminal baru dan masuk ke folder servis AI:
 
 _API Machine Learning sekarang berjalan di `http://localhost:8001` (Cek dokumentasi interaktif di `http://localhost:8001/docs`)._
 
-### 3. Setup Web Platform (Laravel 12)
+### Setup Web Platform (Laravel 12)
 
 Buka tab terminal baru (biarkan server FastAPI tetap berjalan), dan masuk ke folder web:
 
     cd web-platform
 
-    # Instal dependensi PHP
+    # Lakukan proses install dependensi PHP
     composer install
 
-    # Salin file environment dan atur konfigurasi database
+    # kemudian setelah melakukan proses install dependensi, Salin file environment dan atur konfigurasi database
     cp .env.example .env
 
     # Generate application key
@@ -96,7 +96,7 @@ _Aplikasi web utama sekarang bisa diakses melalui browser di `http://localhost:8
 
 ---
 
-## 👥 Tim Pengembang (AI Engineer Learning Path)
+## Tim Pengembang (AI Engineer Learning Path)
 
 1. **Darren Stanford Soputra** (APC320D6Y0012) - Koordinasi Tim, Preprocessing & Evaluasi
 2. **Chellyne Yuwono** (APC320D6X0127) - Ekstraksi Fitur Teks & Similarity Engine
