@@ -80,9 +80,6 @@ COPY . .
 # Laravel reads public/build/manifest.json to fingerprint asset URLs
 COPY --from=node-builder /app/public/build ./public/build
 
-# Generate optimised class map (scripts skipped in composer stage, safe to run now)
-RUN composer dump-autoload --optimize --no-dev --no-scripts
-
 # Fix storage and cache permissions (777 to allow any runtime user on Hugging Face Spaces)
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 777 storage bootstrap/cache

@@ -1,5 +1,6 @@
 # Dev tooling & local state
 node_modules
+vendor
 .env
 .env.*
 !.env.example
